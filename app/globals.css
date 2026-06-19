@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f5f7fb;
+  --foreground: #172033;
+  --admin-blue: #0864d9;
+  --admin-ink: #172033;
+  --admin-muted: #667085;
+  --admin-line: #d6dbe5;
+  --admin-surface: #ffffff;
+  --admin-canvas: #f5f7fb;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: Arial, "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--background);
+}
+
+body {
+  min-width: 320px;
+  margin: 0;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 3px solid rgb(59 130 246 / 35%);
+  outline-offset: 2px;
+}
+
+button:disabled,
+input:disabled {
+  cursor: not-allowed;
+}
+
+@layer components {
+  .onboarding-input {
+    @apply h-12 w-full rounded-lg border border-slate-300 bg-white px-4 text-base text-slate-900 shadow-sm transition placeholder:text-slate-400 hover:border-slate-400 focus:border-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-100 disabled:bg-slate-100 disabled:text-slate-500;
+  }
+
+  .primary-action {
+    @apply flex h-12 w-fit items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-200 disabled:bg-blue-300;
+  }
+
+  .secondary-action {
+    @apply flex h-10 w-fit items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:text-slate-400;
+  }
+
+  .icon-button {
+    @apply inline-flex size-10 items-center justify-center rounded-lg text-slate-600 transition hover:bg-slate-100 hover:text-slate-950;
+  }
+
+  .dashboard-panel {
+    @apply rounded-xl border border-slate-200 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)];
+  }
+
+  .dashboard-title {
+    @apply text-lg font-bold tracking-tight text-slate-950 sm:text-xl;
+  }
+
+  @media (min-width: 640px) {
+    .dashboard-metrics-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1180px) {
+    .dashboard-metrics-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .dashboard-primary-grid {
+      grid-template-columns: minmax(0, 2fr) minmax(300px, 0.95fr);
+    }
+
+    .dashboard-secondary-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

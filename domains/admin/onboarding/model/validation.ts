@@ -7,6 +7,7 @@ export type FieldErrors<T> = Partial<Record<keyof T, string>>;
 
 const LOGIN_ID_PATTERN = /^[a-z0-9_-]{4,15}$/;
 const OTP_PATTERN = /^\d{6}$/;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PASSWORD_RULES = [/[A-Z]/, /[a-z]/, /\d/, /[^A-Za-z0-9]/];
 
 export function validateTemporaryLogin(
@@ -14,8 +15,10 @@ export function validateTemporaryLogin(
 ): FieldErrors<TemporaryLoginInput> {
   const errors: FieldErrors<TemporaryLoginInput> = {};
 
-  if (!input.temporaryId.trim()) {
-    errors.temporaryId = "임시 ID를 입력해 주세요.";
+  if (!input.email.trim()) {
+    errors.email = "이메일을 입력해 주세요.";
+  } else if (!EMAIL_PATTERN.test(input.email)) {
+    errors.email = "유효한 이메일을 입력해 주세요.";
   }
 
   if (!input.temporaryPassword) {

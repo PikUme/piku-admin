@@ -1,4 +1,4 @@
-import { ArrowRight, Badge, LockKeyhole } from "lucide-react";
+import { ArrowRight, LockKeyhole, Mail } from "lucide-react";
 import type { FormEvent } from "react";
 
 import type { TemporaryLoginInput } from "../api/contracts";
@@ -22,21 +22,22 @@ export function TemporaryLoginStep({
   return (
     <form className="mt-8 space-y-6" onSubmit={onSubmit} noValidate>
       <Field
-        id="temporary-id"
-        label="임시 ID"
-        icon={<Badge aria-hidden="true" size={20} />}
-        error={errors.temporaryId}
+        id="temporary-email"
+        label="이메일"
+        icon={<Mail aria-hidden="true" size={20} />}
+        error={errors.email}
       >
         <input
-          id="temporary-id"
-          value={value.temporaryId}
-          onChange={(event) => onChange("temporaryId", event.target.value)}
+          id="temporary-email"
+          type="email"
+          value={value.email}
+          onChange={(event) => onChange("email", event.target.value)}
           className="onboarding-input pl-11"
-          placeholder="예: temp.user.123"
-          autoComplete="username"
+          placeholder="admin@example.com"
+          autoComplete="email"
           disabled={pending}
-          aria-invalid={Boolean(errors.temporaryId)}
-          aria-describedby={errors.temporaryId ? "temporary-id-error" : undefined}
+          aria-invalid={Boolean(errors.email)}
+          aria-describedby={errors.email ? "temporary-email-error" : undefined}
         />
       </Field>
 

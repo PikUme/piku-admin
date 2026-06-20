@@ -1,5 +1,5 @@
 export interface TemporaryLoginInput {
-  temporaryId: string;
+  email: string;
   temporaryPassword: string;
 }
 
@@ -13,10 +13,12 @@ export interface CredentialsForm extends CredentialsInput {
 }
 
 export interface VerifyOtpInput {
-  code: string;
+  otpCode: string;
 }
 
 export interface OtpRegistration {
+  issuer: string;
+  accountName: string;
   qrCodeDataUrl: string;
   manualEntryKey: string;
 }
@@ -27,14 +29,4 @@ export interface OnboardingApi {
   updateCredentials(input: CredentialsInput): Promise<void>;
   startOtpRegistration(): Promise<OtpRegistration>;
   verifyOtp(input: VerifyOtpInput): Promise<void>;
-}
-
-export class OnboardingApiError extends Error {
-  constructor(
-    message: string,
-    readonly status?: number,
-  ) {
-    super(message);
-    this.name = "OnboardingApiError";
-  }
 }

@@ -15,20 +15,22 @@ describe("onboardingReducer", () => {
   it("updates and preserves form values while moving forward", () => {
     const edited = onboardingReducer(initialOnboardingState, {
       type: "temporaryFieldChanged",
-      field: "temporaryId",
-      value: "temp.user.123",
+      field: "email",
+      value: "admin@example.com",
     });
     const next = onboardingReducer(edited, { type: "temporaryLoginSucceeded" });
 
     expect(next).toMatchObject({
       step: 2,
       status: "ready",
-      temporaryLogin: { temporaryId: "temp.user.123" },
+      temporaryLogin: { email: "admin@example.com" },
     });
   });
 
   it("stores OTP registration data when credentials succeed", () => {
     const registration = {
+      issuer: "Pikume Ops",
+      accountName: "admin_1",
       qrCodeDataUrl: "data:image/svg+xml,qr",
       manualEntryKey: "JBSWY3DPEHPK3PXP",
     };

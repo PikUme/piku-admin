@@ -1,31 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Pikume Admin
 
-## Getting Started
+Next.js App Router 기반 관리자 콘솔입니다. 페이지는 라우팅만 담당하고, 로그인·온보딩·대시보드의 API, 상태, UI는 도메인 단위로 분리되어 있습니다.
 
-Install dependencies and run the development server with pnpm:
+## Getting started
 
 ```bash
 pnpm install
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+기본 경로는 `/admin/login`으로 이동합니다. 임시 계정을 발급받은 관리자는 로그인 화면의 링크를 통해 `/admin/onboarding`으로 이동할 수 있습니다.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+`.env.sample`을 `.env.local`로 복사해 사용합니다.
 
-## Learn More
+```dotenv
+NEXT_PUBLIC_API_MODE=mock
+NEXT_PUBLIC_BACKEND_BASE_URL=http://localhost:8080
+NEXT_PUBLIC_CSRF_COOKIE_NAME=csrf_token
+NEXT_PUBLIC_CSRF_HEADER_NAME=csrf_token
+```
 
-To learn more about Next.js, take a look at the following resources:
+`NEXT_PUBLIC_API_MODE`가 `mock`이면 정적 mock API를 사용하며, `remote`이면 백엔드 API를 호출합니다. CSRF 쿠키명과 헤더명은 각각 환경변수로 덮어쓸 수 있고 기본값은 모두 `csrf_token`입니다.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Verification
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+pnpm test
+pnpm lint
+pnpm typecheck
+pnpm build
+```

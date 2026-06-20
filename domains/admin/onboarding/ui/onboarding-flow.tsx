@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useMemo, useReducer, useRef, useState } from "react";
 
 import { createOnboardingApi } from "../api";
-import { OnboardingApiError, type OnboardingApi } from "../api/contracts";
+import type { OnboardingApi } from "../api/contracts";
+import { AdminApiError } from "@/shared/api/admin-auth/contracts";
 import { initialOnboardingState, onboardingReducer } from "../model/reducer";
 import {
   type FieldErrors,
@@ -26,7 +27,7 @@ function hasErrors(errors: object): boolean {
 }
 
 function apiErrorMessage(error: unknown): string {
-  return error instanceof OnboardingApiError
+  return error instanceof AdminApiError
     ? error.message
     : "요청을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.";
 }
@@ -100,7 +101,7 @@ export function OnboardingFlow({ api }: { api?: OnboardingApi }) {
 
     dispatch({ type: "requestStarted" });
     try {
-      await apiClient.verifyOtp({ code: state.otpCode });
+      await apiClient.verifyOtp({ otpCode: state.otpCode });
       router.replace("/admin/dashboard");
     } catch (reason) {
       dispatch({ type: "requestFailed", error: apiErrorMessage(reason) });
@@ -108,7 +109,8 @@ export function OnboardingFlow({ api }: { api?: OnboardingApi }) {
   }
 
   const pending = state.status === "submitting";
-  const csrfUnavailable = state.status === "failed" && state.step === 1 && !state.temporaryLogin.temporaryId;
+  const csrfUnavailable =
+    state.status === "failed" && state.step === 1 && !state.temporaryLogin.email;
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-10 sm:px-6">

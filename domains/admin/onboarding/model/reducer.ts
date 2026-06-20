@@ -25,7 +25,7 @@ export const initialOnboardingState: OnboardingState = {
   step: 1,
   status: "initializing",
   temporaryLogin: {
-    temporaryId: "",
+    email: "",
     temporaryPassword: "",
   },
   credentials: {

@@ -9,9 +9,9 @@ import {
 describe("validateTemporaryLogin", () => {
   it("requires both temporary credentials", () => {
     expect(
-      validateTemporaryLogin({ temporaryId: "", temporaryPassword: "" }),
+      validateTemporaryLogin({ email: "", temporaryPassword: "" }),
     ).toEqual({
-      temporaryId: "임시 ID를 입력해 주세요.",
+      email: "이메일을 입력해 주세요.",
       temporaryPassword: "임시 비밀번호를 입력해 주세요.",
     });
   });
@@ -19,7 +19,7 @@ describe("validateTemporaryLogin", () => {
   it("accepts non-empty temporary credentials", () => {
     expect(
       validateTemporaryLogin({
-        temporaryId: "temp.user.123",
+        email: "admin@example.com",
         temporaryPassword: "temporary-password",
       }),
     ).toEqual({});

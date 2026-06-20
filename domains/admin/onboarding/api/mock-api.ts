@@ -29,6 +29,8 @@ export function createMockOnboardingApi({ delay = 180 }: { delay?: number } = {}
     async startOtpRegistration() {
       await wait();
       return {
+        issuer: "Pikume Ops",
+        accountName: "admin_1",
         qrCodeDataUrl: MOCK_QR_DATA_URL,
         manualEntryKey: MOCK_MANUAL_ENTRY_KEY,
       };

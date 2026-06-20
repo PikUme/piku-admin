@@ -17,6 +17,8 @@ function createApi(): OnboardingApi {
     temporaryLogin: vi.fn().mockResolvedValue(undefined),
     updateCredentials: vi.fn().mockResolvedValue(undefined),
     startOtpRegistration: vi.fn().mockResolvedValue({
+      issuer: "Pikume Ops",
+      accountName: "admin_1",
       qrCodeDataUrl: "data:image/svg+xml,qr",
       manualEntryKey: "JBSWY3DPEHPK3PXP",
     }),
@@ -47,7 +49,7 @@ describe("OnboardingFlow", () => {
 
     await user.click(screen.getByRole("button", { name: "다음" }));
 
-    expect(screen.getByText("임시 ID를 입력해 주세요.")).toBeInTheDocument();
+    expect(screen.getByText("이메일을 입력해 주세요.")).toBeInTheDocument();
     expect(api.temporaryLogin).not.toHaveBeenCalled();
   });
 
@@ -57,7 +59,7 @@ describe("OnboardingFlow", () => {
     render(<OnboardingFlow api={api} />);
     await waitFor(() => expect(api.initializeCsrf).toHaveBeenCalledOnce());
 
-    await user.type(screen.getByLabelText("임시 ID"), "temp.user.123");
+    await user.type(screen.getByLabelText("이메일"), "admin@example.com");
     await user.type(screen.getByLabelText("임시 비밀번호"), "temporary-password");
     await user.click(screen.getByRole("button", { name: "다음" }));
 
@@ -78,7 +80,7 @@ describe("OnboardingFlow", () => {
     await user.click(screen.getByRole("button", { name: "인증 완료" }));
 
     await waitFor(() => {
-      expect(api.verifyOtp).toHaveBeenCalledWith({ code: "123456" });
+      expect(api.verifyOtp).toHaveBeenCalledWith({ otpCode: "123456" });
       expect(replace).toHaveBeenCalledWith("/admin/dashboard");
     });
   });
@@ -96,6 +98,6 @@ describe("OnboardingFlow", () => {
     await user.click(screen.getByRole("button", { name: "다시 시도" }));
 
     await waitFor(() => expect(api.initializeCsrf).toHaveBeenCalledTimes(2));
-    expect(await screen.findByLabelText("임시 ID")).toBeEnabled();
+    expect(await screen.findByLabelText("이메일")).toBeEnabled();
   });
 });

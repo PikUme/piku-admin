@@ -2,6 +2,7 @@
   "name": "piku-admin",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@11.8.0",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -18,7 +19,7 @@
     "react-dom": "19.2.4"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
+    "@tailwindcss/postcss": "^4.3.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
@@ -28,7 +29,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
     "jsdom": "^29.1.1",
-    "tailwindcss": "^4",
+    "tailwindcss": "^4.3.1",
     "typescript": "^5",
     "vitest": "^4.1.9"
   }

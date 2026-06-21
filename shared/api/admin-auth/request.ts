@@ -11,8 +11,8 @@ interface AdminRequestOptions {
 
 interface CreateAdminAuthRequestOptions {
   baseUrl: string;
-  csrfCookieName?: string;
-  csrfHeaderName?: string;
+  csrfCookieName: string;
+  csrfHeaderName: string;
   cookieSource?: () => string;
   fetcher?: typeof fetch;
 }
@@ -48,8 +48,8 @@ async function readResponseBody(response: Response): Promise<unknown> {
 
 export function createAdminAuthRequest({
   baseUrl,
-  csrfCookieName = process.env.NEXT_PUBLIC_CSRF_COOKIE_NAME ?? "csrf_token",
-  csrfHeaderName = process.env.NEXT_PUBLIC_CSRF_HEADER_NAME ?? "csrf_token",
+  csrfCookieName,
+  csrfHeaderName,
   cookieSource = () => (typeof document === "undefined" ? "" : document.cookie),
   fetcher = fetch,
 }: CreateAdminAuthRequestOptions): AdminAuthRequest {

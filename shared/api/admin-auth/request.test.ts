@@ -40,6 +40,8 @@ describe("createAdminAuthRequest", () => {
       .mockResolvedValue(new Response(null, { status: 204 }));
     const request = createAdminAuthRequest({
       baseUrl: "https://api.example.com",
+      csrfCookieName: "csrf_token",
+      csrfHeaderName: "csrf_header",
       fetcher,
       cookieSource: () => "",
     });
@@ -55,30 +57,12 @@ describe("createAdminAuthRequest", () => {
     );
   });
 
-  it("defaults both CSRF names to csrf_token", async () => {
-    const fetcher = vi
-      .fn<typeof fetch>()
-      .mockResolvedValue(new Response(null, { status: 204 }));
-    const request = createAdminAuthRequest({
-      baseUrl: "https://api.example.com",
-      cookieSource: () => "csrf_token=default-token",
-      fetcher,
-    });
-
-    await request("/api/admin/auth/logout", { method: "POST" });
-
-    expect(fetcher).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.objectContaining({
-        headers: expect.objectContaining({ csrf_token: "default-token" }),
-      }),
-    );
-  });
-
   it("rejects unsafe requests before fetch when the CSRF cookie is missing", async () => {
     const fetcher = vi.fn<typeof fetch>();
     const request = createAdminAuthRequest({
       baseUrl: "https://api.example.com",
+      csrfCookieName: "csrf_token",
+      csrfHeaderName: "csrf_header",
       cookieSource: () => "",
       fetcher,
     });
@@ -105,6 +89,8 @@ describe("createAdminAuthRequest", () => {
     );
     const request = createAdminAuthRequest({
       baseUrl: "https://api.example.com",
+      csrfCookieName: "csrf_token",
+      csrfHeaderName: "csrf_header",
       cookieSource: () => "csrf_token=token",
       fetcher,
     });

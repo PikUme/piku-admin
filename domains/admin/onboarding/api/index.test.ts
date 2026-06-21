@@ -3,9 +3,26 @@ import { describe, expect, it, vi } from "vitest";
 import { createOnboardingApi } from ".";
 
 describe("createOnboardingApi", () => {
-  it("uses mock mode by default", async () => {
+  it("uses the remote HTTP adapter by default", async () => {
+    const fetcher = vi
+      .fn<typeof fetch>()
+      .mockResolvedValue(new Response(null, { status: 204 }));
+    const api = createOnboardingApi({
+      baseUrl: "https://api.example.com",
+      fetcher,
+    });
+
+    await expect(api.initializeCsrf()).resolves.toBeUndefined();
+    expect(fetcher).toHaveBeenCalledOnce();
+  });
+
+  it("uses mock mode only when explicitly requested", async () => {
     const fetcher = vi.fn<typeof fetch>();
-    const api = createOnboardingApi({ fetcher });
+    const api = createOnboardingApi({
+      mode: "mock",
+      fetcher,
+      mockDelay: 0,
+    });
 
     await expect(api.initializeCsrf()).resolves.toBeUndefined();
     expect(fetcher).not.toHaveBeenCalled();

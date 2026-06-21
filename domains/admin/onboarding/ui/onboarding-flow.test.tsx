@@ -2,6 +2,12 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import {
+  ADMIN_ROLE,
+  AdminApiError,
+} from "@/shared/api/admin-auth/contracts";
+import { AUTHENTICATED_ADMIN_STORAGE_KEY } from "@/shared/api/admin-auth/session";
+
 import type { OnboardingApi } from "../api/contracts";
 import { OnboardingFlow } from "./onboarding-flow";
 
@@ -17,18 +23,20 @@ function createApi(): OnboardingApi {
     temporaryLogin: vi.fn().mockResolvedValue(undefined),
     updateCredentials: vi.fn().mockResolvedValue(undefined),
     startOtpRegistration: vi.fn().mockResolvedValue({
-      issuer: "Pikume Ops",
-      accountName: "admin_1",
       qrCodeDataUrl: "data:image/svg+xml,qr",
       manualEntryKey: "JBSWY3DPEHPK3PXP",
     }),
-    verifyOtp: vi.fn().mockResolvedValue(undefined),
+    verifyOtp: vi.fn().mockResolvedValue({
+      nickname: "운영자",
+      role: ADMIN_ROLE.OPERATOR,
+    }),
   };
 }
 
 describe("OnboardingFlow", () => {
   beforeEach(() => {
     replace.mockReset();
+    sessionStorage.clear();
   });
 
   it("initializes CSRF and never renders a previous-step control", async () => {
@@ -81,8 +89,45 @@ describe("OnboardingFlow", () => {
 
     await waitFor(() => {
       expect(api.verifyOtp).toHaveBeenCalledWith({ otpCode: "123456" });
+      expect(
+        JSON.parse(
+          sessionStorage.getItem(AUTHENTICATED_ADMIN_STORAGE_KEY) ?? "null",
+        ),
+      ).toEqual({ nickname: "운영자", role: ADMIN_ROLE.OPERATOR });
       expect(replace).toHaveBeenCalledWith("/admin/dashboard");
     });
+  });
+
+  it("shows a backend login ID conflict on the credentials step", async () => {
+    const user = userEvent.setup();
+    const api = createApi();
+    vi.mocked(api.updateCredentials).mockRejectedValue(
+      new AdminApiError("중복된 로그인 ID입니다.", {
+        status: 409,
+        fieldErrors: { loginId: "이미 사용 중인 로그인 ID입니다." },
+      }),
+    );
+    render(<OnboardingFlow api={api} />);
+
+    await user.type(await screen.findByLabelText("이메일"), "admin@example.com");
+    await user.type(
+      screen.getByLabelText("임시 비밀번호"),
+      "temporary-password",
+    );
+    await user.click(screen.getByRole("button", { name: "다음" }));
+
+    await user.type(await screen.findByLabelText("로그인 ID"), "admin_1");
+    await user.type(screen.getByLabelText("비밀번호"), "Strong!234");
+    await user.type(screen.getByLabelText("비밀번호 확인"), "Strong!234");
+    await user.click(screen.getByRole("button", { name: "다음 단계" }));
+
+    expect(
+      await screen.findByText("이미 사용 중인 로그인 ID입니다."),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("progressbar")).toHaveAttribute(
+      "aria-valuenow",
+      "2",
+    );
   });
 
   it("shows a retry action when CSRF initialization fails", async () => {

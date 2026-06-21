@@ -7,6 +7,10 @@ import { type FormEvent, useEffect, useMemo, useReducer, useRef, useState } from
 import { createOnboardingApi } from "../api";
 import type { OnboardingApi } from "../api/contracts";
 import { AdminApiError } from "@/shared/api/admin-auth/contracts";
+import {
+  clearAuthenticatedAdmin,
+  saveAuthenticatedAdmin,
+} from "@/shared/api/admin-auth/session";
 import { initialOnboardingState, onboardingReducer } from "../model/reducer";
 import {
   type FieldErrors,
@@ -32,6 +36,12 @@ function apiErrorMessage(error: unknown): string {
     : "요청을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.";
 }
 
+function fieldError(error: unknown, name: string): string | undefined {
+  return error instanceof AdminApiError
+    ? error.fieldErrors?.[name]
+    : undefined;
+}
+
 export function OnboardingFlow({ api }: { api?: OnboardingApi }) {
   const router = useRouter();
   const apiClient = useMemo(() => api ?? createOnboardingApi(), [api]);
@@ -42,6 +52,7 @@ export function OnboardingFlow({ api }: { api?: OnboardingApi }) {
   const initializationStarted = useRef(false);
 
   async function initializeCsrf() {
+    clearAuthenticatedAdmin();
     dispatch({ type: "requestStarted" });
     try {
       await apiClient.initializeCsrf();
@@ -70,6 +81,10 @@ export function OnboardingFlow({ api }: { api?: OnboardingApi }) {
       await apiClient.temporaryLogin(state.temporaryLogin);
       dispatch({ type: "temporaryLoginSucceeded" });
     } catch (error) {
+      setTemporaryErrors({
+        email: fieldError(error, "email"),
+        temporaryPassword: fieldError(error, "temporaryPassword"),
+      });
       dispatch({ type: "requestFailed", error: apiErrorMessage(error) });
     }
   }
@@ -89,6 +104,10 @@ export function OnboardingFlow({ api }: { api?: OnboardingApi }) {
       const registration = await apiClient.startOtpRegistration();
       dispatch({ type: "credentialsSucceeded", registration });
     } catch (error) {
+      setCredentialsErrors({
+        loginId: fieldError(error, "loginId"),
+        password: fieldError(error, "password"),
+      });
       dispatch({ type: "requestFailed", error: apiErrorMessage(error) });
     }
   }
@@ -101,10 +120,12 @@ export function OnboardingFlow({ api }: { api?: OnboardingApi }) {
 
     dispatch({ type: "requestStarted" });
     try {
-      await apiClient.verifyOtp({ otpCode: state.otpCode });
+      const admin = await apiClient.verifyOtp({ otpCode: state.otpCode });
+      saveAuthenticatedAdmin(admin);
       router.replace("/admin/dashboard");
-    } catch (reason) {
-      dispatch({ type: "requestFailed", error: apiErrorMessage(reason) });
+    } catch (error) {
+      setOtpError(fieldError(error, "otpCode"));
+      dispatch({ type: "requestFailed", error: apiErrorMessage(error) });
     }
   }
 

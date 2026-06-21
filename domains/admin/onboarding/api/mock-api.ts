@@ -1,3 +1,5 @@
+import { ADMIN_ROLE } from "@/shared/api/admin-auth/contracts";
+
 import type { OnboardingApi } from "./contracts";
 
 const MOCK_MANUAL_ENTRY_KEY = "JBSWY3DPEHPK3PXP";
@@ -29,14 +31,16 @@ export function createMockOnboardingApi({ delay = 180 }: { delay?: number } = {}
     async startOtpRegistration() {
       await wait();
       return {
-        issuer: "Pikume Ops",
-        accountName: "admin_1",
         qrCodeDataUrl: MOCK_QR_DATA_URL,
         manualEntryKey: MOCK_MANUAL_ENTRY_KEY,
       };
     },
     async verifyOtp() {
       await wait();
+      return {
+        nickname: "Pikume 관리자",
+        role: ADMIN_ROLE.SUPER_ADMIN,
+      };
     },
   };
 }

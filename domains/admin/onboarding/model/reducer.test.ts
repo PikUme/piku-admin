@@ -29,8 +29,6 @@ describe("onboardingReducer", () => {
 
   it("stores OTP registration data when credentials succeed", () => {
     const registration = {
-      issuer: "Pikume Ops",
-      accountName: "admin_1",
       qrCodeDataUrl: "data:image/svg+xml,qr",
       manualEntryKey: "JBSWY3DPEHPK3PXP",
     };

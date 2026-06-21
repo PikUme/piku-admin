@@ -17,8 +17,6 @@ export interface VerifyOtpInput {
 }
 
 export interface OtpRegistration {
-  issuer: string;
-  accountName: string;
   qrCodeDataUrl: string;
   manualEntryKey: string;
 }
@@ -28,5 +26,6 @@ export interface OnboardingApi {
   temporaryLogin(input: TemporaryLoginInput): Promise<void>;
   updateCredentials(input: CredentialsInput): Promise<void>;
   startOtpRegistration(): Promise<OtpRegistration>;
-  verifyOtp(input: VerifyOtpInput): Promise<void>;
+  verifyOtp(input: VerifyOtpInput): Promise<AuthenticatedAdmin>;
 }
+import type { AuthenticatedAdmin } from "@/shared/api/admin-auth/contracts";

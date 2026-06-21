@@ -1,7 +1,14 @@
 import QRCode from "qrcode";
 
-import { AdminApiError } from "@/shared/api/admin-auth/contracts";
+import {
+  ADMIN_AUTH_NEXT_STEP,
+  AdminApiError,
+} from "@/shared/api/admin-auth/contracts";
 import type { AdminAuthRequest } from "@/shared/api/admin-auth/request";
+import {
+  parseAdminNextStep,
+  parseAuthenticatedAdmin,
+} from "@/shared/api/admin-auth/response";
 
 import {
   type CredentialsInput,
@@ -11,8 +18,6 @@ import {
 } from "./contracts";
 
 interface OtpRegistrationResponse {
-  issuer: string;
-  accountName: string;
   provisioningUri: string;
   manualEntryKey: string;
 }
@@ -23,18 +28,12 @@ function parseOtpRegistration(body: unknown): OtpRegistrationResponse {
   if (
     typeof body === "object" &&
     body !== null &&
-    "issuer" in body &&
-    typeof body.issuer === "string" &&
-    "accountName" in body &&
-    typeof body.accountName === "string" &&
     "provisioningUri" in body &&
     typeof body.provisioningUri === "string" &&
     "manualEntryKey" in body &&
     typeof body.manualEntryKey === "string"
   ) {
     return {
-      issuer: body.issuer,
-      accountName: body.accountName,
       provisioningUri: body.provisioningUri,
       manualEntryKey: body.manualEntryKey,
     };
@@ -60,16 +59,22 @@ export function createHttpOnboardingApi(
       await request("/api/admin/auth/csrf", { method: "POST", csrf: false });
     },
     async temporaryLogin(input: TemporaryLoginInput) {
-      await request("/api/admin/auth/temporary-login", {
-        method: "POST",
-        body: input,
-      });
+      parseAdminNextStep(
+        await request("/api/admin/auth/temporary-login", {
+          method: "POST",
+          body: input,
+        }),
+        ADMIN_AUTH_NEXT_STEP.SET_CREDENTIALS,
+      );
     },
     async updateCredentials(input: CredentialsInput) {
-      await request("/api/admin/auth/onboarding/credentials", {
-        method: "PATCH",
-        body: input,
-      });
+      parseAdminNextStep(
+        await request("/api/admin/auth/onboarding/credentials", {
+          method: "PATCH",
+          body: input,
+        }),
+        ADMIN_AUTH_NEXT_STEP.REGISTER_OTP,
+      );
     },
     async startOtpRegistration() {
       const registration = parseOtpRegistration(
@@ -77,17 +82,17 @@ export function createHttpOnboardingApi(
       );
 
       return {
-        issuer: registration.issuer,
-        accountName: registration.accountName,
         qrCodeDataUrl: await qrEncoder(registration.provisioningUri),
         manualEntryKey: registration.manualEntryKey,
       };
     },
     async verifyOtp(input: VerifyOtpInput) {
-      await request("/api/admin/auth/onboarding/otp/verify", {
-        method: "POST",
-        body: input,
-      });
+      return parseAuthenticatedAdmin(
+        await request("/api/admin/auth/onboarding/otp/verify", {
+          method: "POST",
+          body: input,
+        }),
+      );
     },
   };
 }

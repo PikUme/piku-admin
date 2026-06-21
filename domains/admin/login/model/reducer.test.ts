@@ -1,13 +1,11 @@
 import { describe, expect, it } from "vitest";
 
+import { ADMIN_AUTH_NEXT_STEP } from "@/shared/api/admin-auth/contracts";
+
 import { initialLoginState, loginReducer } from "./reducer";
 
 const challenge = {
-  nextStep: "VERIFY_OTP" as const,
-  loginId: "admin_1",
-  nickname: "운영자",
-  email: "admin@example.com",
-  role: "SUPER_ADMIN" as const,
+  nextStep: ADMIN_AUTH_NEXT_STEP.VERIFY_OTP,
 };
 
 describe("loginReducer", () => {

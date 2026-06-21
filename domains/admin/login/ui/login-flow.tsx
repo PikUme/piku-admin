@@ -5,6 +5,10 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useMemo, useReducer, useRef, useState } from "react";
 
 import { AdminApiError } from "@/shared/api/admin-auth/contracts";
+import {
+  clearAuthenticatedAdmin,
+  saveAuthenticatedAdmin,
+} from "@/shared/api/admin-auth/session";
 
 import { createLoginApi } from "../api";
 import type { LoginApi } from "../api/contracts";
@@ -28,6 +32,15 @@ function apiErrorMessage(error: unknown): string {
     : "요청을 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.";
 }
 
+function backendLoginFieldErrors(error: unknown): LoginFieldErrors {
+  if (!(error instanceof AdminApiError)) return {};
+
+  return {
+    loginId: error.fieldErrors?.loginId,
+    password: error.fieldErrors?.password,
+  };
+}
+
 export function LoginFlow({ api }: { api?: LoginApi }) {
   const router = useRouter();
   const apiClient = useMemo(() => api ?? createLoginApi(), [api]);
@@ -38,6 +51,7 @@ export function LoginFlow({ api }: { api?: LoginApi }) {
   const initializationStarted = useRef(false);
 
   async function initializeCsrf() {
+    clearAuthenticatedAdmin();
     setCsrfFailed(false);
     dispatch({ type: "requestStarted" });
     try {
@@ -68,6 +82,8 @@ export function LoginFlow({ api }: { api?: LoginApi }) {
       const challenge = await apiClient.login(state.credentials);
       dispatch({ type: "loginSucceeded", challenge });
     } catch (error) {
+      const errors = backendLoginFieldErrors(error);
+      if (hasErrors(errors)) setFieldErrors(errors);
       dispatch({ type: "requestFailed", error: apiErrorMessage(error) });
     }
   }
@@ -80,10 +96,14 @@ export function LoginFlow({ api }: { api?: LoginApi }) {
 
     dispatch({ type: "requestStarted" });
     try {
-      const result = await apiClient.verifyOtp({ otpCode: state.otpCode });
-      if (result.authenticated) router.replace("/admin/dashboard");
-    } catch (reason) {
-      dispatch({ type: "requestFailed", error: apiErrorMessage(reason) });
+      const admin = await apiClient.verifyOtp({ otpCode: state.otpCode });
+      saveAuthenticatedAdmin(admin);
+      router.replace("/admin/dashboard");
+    } catch (error) {
+      if (error instanceof AdminApiError && error.fieldErrors?.otpCode) {
+        setOtpError(error.fieldErrors.otpCode);
+      }
+      dispatch({ type: "requestFailed", error: apiErrorMessage(error) });
     }
   }
 
@@ -135,7 +155,6 @@ export function LoginFlow({ api }: { api?: LoginApi }) {
 
             {state.step === 2 && state.challenge && (
               <LoginOtpStep
-                nickname={state.challenge.nickname}
                 otpCode={state.otpCode}
                 error={otpError}
                 pending={pending}

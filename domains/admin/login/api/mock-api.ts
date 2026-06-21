@@ -1,32 +1,26 @@
+import {
+  ADMIN_AUTH_NEXT_STEP,
+  ADMIN_ROLE,
+} from "@/shared/api/admin-auth/contracts";
+
 import type { LoginApi } from "./contracts";
 
 export function createMockLoginApi({ delay = 180 }: { delay?: number } = {}): LoginApi {
-  let loginId = "admin_1";
   const wait = () => new Promise<void>((resolve) => setTimeout(resolve, delay));
 
   return {
     initializeCsrf: wait,
-    async login(input) {
+    async login() {
       await wait();
-      loginId = input.loginId;
       return {
-        nextStep: "VERIFY_OTP",
-        loginId,
-        nickname: "Pikume 관리자",
-        email: "admin@pikume.example",
-        role: "SUPER_ADMIN",
+        nextStep: ADMIN_AUTH_NEXT_STEP.VERIFY_OTP,
       };
     },
     async verifyOtp() {
       await wait();
       return {
-        authenticated: true,
-        admin: {
-          loginId,
-          nickname: "Pikume 관리자",
-          email: "admin@pikume.example",
-          role: "SUPER_ADMIN",
-        },
+        nickname: "Pikume 관리자",
+        role: ADMIN_ROLE.SUPER_ADMIN,
       };
     },
   };

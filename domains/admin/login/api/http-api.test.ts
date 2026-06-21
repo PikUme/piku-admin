@@ -1,6 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 
 import type { AdminAuthRequest } from "@/shared/api/admin-auth/request";
+import {
+  ADMIN_AUTH_NEXT_STEP,
+  ADMIN_ROLE,
+} from "@/shared/api/admin-auth/contracts";
 
 import { createHttpLoginApi } from "./http-api";
 
@@ -19,11 +23,7 @@ describe("createHttpLoginApi", () => {
 
   it("sends credentials and returns a VERIFY_OTP challenge", async () => {
     const challenge = {
-      nextStep: "VERIFY_OTP" as const,
-      loginId: "admin_1",
-      nickname: "운영자",
-      email: "admin@example.com",
-      role: "SUPER_ADMIN" as const,
+      nextStep: ADMIN_AUTH_NEXT_STEP.VERIFY_OTP,
     };
     const request = vi.fn<AdminAuthRequest>().mockResolvedValue(challenge);
     const api = createHttpLoginApi(request as unknown as AdminAuthRequest);
@@ -39,13 +39,8 @@ describe("createHttpLoginApi", () => {
 
   it("sends otpCode and returns the authenticated admin", async () => {
     const authentication = {
-      authenticated: true as const,
-      admin: {
-        loginId: "admin_1",
-        nickname: "운영자",
-        email: "admin@example.com",
-        role: "OPERATOR" as const,
-      },
+      nickname: "운영자",
+      role: ADMIN_ROLE.OPERATOR,
     };
     const request = vi.fn<AdminAuthRequest>().mockResolvedValue(authentication);
     const api = createHttpLoginApi(request as unknown as AdminAuthRequest);
@@ -67,6 +62,6 @@ describe("createHttpLoginApi", () => {
 
     await expect(
       api.login({ loginId: "admin_1", password: "Strong!234" }),
-    ).rejects.toThrow("로그인 응답의 다음 단계를 확인할 수 없습니다.");
+    ).rejects.toThrow("관리자 인증 응답의 다음 단계를 확인할 수 없습니다.");
   });
 });

@@ -2,6 +2,15 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import {
+  ADMIN_AUTH_NEXT_STEP,
+  ADMIN_ROLE,
+  AdminApiError,
+} from "@/shared/api/admin-auth/contracts";
+import {
+  AUTHENTICATED_ADMIN_STORAGE_KEY,
+} from "@/shared/api/admin-auth/session";
+
 import type { LoginApi } from "../api/contracts";
 import { LoginFlow } from "./login-flow";
 
@@ -15,26 +24,20 @@ function createApi(): LoginApi {
   return {
     initializeCsrf: vi.fn().mockResolvedValue(undefined),
     login: vi.fn().mockResolvedValue({
-      nextStep: "VERIFY_OTP",
-      loginId: "admin_1",
-      nickname: "운영자",
-      email: "admin@example.com",
-      role: "SUPER_ADMIN",
+      nextStep: ADMIN_AUTH_NEXT_STEP.VERIFY_OTP,
     }),
     verifyOtp: vi.fn().mockResolvedValue({
-      authenticated: true,
-      admin: {
-        loginId: "admin_1",
-        nickname: "운영자",
-        email: "admin@example.com",
-        role: "SUPER_ADMIN",
-      },
+      nickname: "운영자",
+      role: ADMIN_ROLE.SUPER_ADMIN,
     }),
   };
 }
 
 describe("LoginFlow", () => {
-  beforeEach(() => replace.mockReset());
+  beforeEach(() => {
+    replace.mockReset();
+    sessionStorage.clear();
+  });
 
   it("initializes CSRF and links temporary accounts to onboarding", async () => {
     const api = createApi();
@@ -72,7 +75,7 @@ describe("LoginFlow", () => {
     await user.type(screen.getByLabelText("비밀번호"), "Strong!234");
     await user.click(screen.getByRole("button", { name: "로그인" }));
 
-    expect(await screen.findByText("운영자님, OTP 코드를 입력해 주세요.")).toBeInTheDocument();
+    expect(await screen.findByText("OTP 코드를 입력해 주세요.")).toBeInTheDocument();
     expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "2");
     await user.type(screen.getByLabelText("인증 코드 (6자리)"), "123456");
     await user.click(screen.getByRole("button", { name: "OTP 인증" }));
@@ -83,8 +86,37 @@ describe("LoginFlow", () => {
         password: "Strong!234",
       });
       expect(api.verifyOtp).toHaveBeenCalledWith({ otpCode: "123456" });
+      expect(
+        JSON.parse(
+          sessionStorage.getItem(AUTHENTICATED_ADMIN_STORAGE_KEY) ?? "null",
+        ),
+      ).toEqual({ nickname: "운영자", role: ADMIN_ROLE.SUPER_ADMIN });
       expect(replace).toHaveBeenCalledWith("/admin/dashboard");
     });
+  });
+
+  it("shows backend field errors without advancing", async () => {
+    const user = userEvent.setup();
+    const api = createApi();
+    vi.mocked(api.login).mockRejectedValue(
+      new AdminApiError("입력 오류", {
+        status: 400,
+        fieldErrors: { loginId: "로그인 ID를 확인해 주세요." },
+      }),
+    );
+    render(<LoginFlow api={api} />);
+
+    await user.type(await screen.findByLabelText("로그인 ID"), "admin_1");
+    await user.type(screen.getByLabelText("비밀번호"), "Strong!234");
+    await user.click(screen.getByRole("button", { name: "로그인" }));
+
+    expect(
+      await screen.findByText("로그인 ID를 확인해 주세요."),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("progressbar")).toHaveAttribute(
+      "aria-valuenow",
+      "1",
+    );
   });
 
   it("shows a retry screen when CSRF initialization fails", async () => {

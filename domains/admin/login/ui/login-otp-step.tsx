@@ -2,7 +2,6 @@ import { ShieldCheck } from "lucide-react";
 import type { FormEvent } from "react";
 
 interface LoginOtpStepProps {
-  nickname: string;
   otpCode: string;
   error?: string;
   pending: boolean;
@@ -11,7 +10,6 @@ interface LoginOtpStepProps {
 }
 
 export function LoginOtpStep({
-  nickname,
   otpCode,
   error,
   pending,
@@ -21,9 +19,7 @@ export function LoginOtpStep({
   return (
     <form className="mt-8" onSubmit={onSubmit} noValidate>
       <div className="rounded-xl border border-blue-100 bg-blue-50 px-5 py-4">
-        <p className="font-semibold text-blue-900">
-          {nickname}님, OTP 코드를 입력해 주세요.
-        </p>
+        <p className="font-semibold text-blue-900">OTP 코드를 입력해 주세요.</p>
         <p className="mt-1 text-sm leading-6 text-blue-700">
           등록된 인증 앱에 표시된 6자리 숫자를 입력하면 로그인이 완료됩니다.
         </p>

@@ -4,6 +4,7 @@ import {
   ChartNoAxesCombined,
   History,
   LayoutDashboard,
+  type LucideIcon,
   UserRound,
   UsersRound,
 } from "lucide-react";
@@ -11,17 +12,25 @@ import {
 import { ADMIN_ROLE } from "@/shared/api/admin-auth/contracts";
 import { useAuthenticatedAdmin } from "@/shared/api/admin-auth/use-authenticated-admin";
 
-const defaultNavItems = [
+interface DashboardNavItem {
+  label: string;
+  icon: LucideIcon;
+  active?: boolean;
+}
+
+const defaultNavItems: DashboardNavItem[] = [
   { label: "Dashboard", icon: LayoutDashboard, active: true },
   { label: "Statistics", icon: ChartNoAxesCombined },
 ];
 
-const adminManagementItem = {
+const adminManagementItem: DashboardNavItem = {
   label: "Admin Management",
   icon: UsersRound,
 };
 
-const trailingNavItems = [{ label: "Audit Log", icon: History }];
+const trailingNavItems: DashboardNavItem[] = [
+  { label: "Audit Log", icon: History },
+];
 
 export function DashboardSidebar() {
   const admin = useAuthenticatedAdmin();

@@ -9,6 +9,7 @@ describe("Dashboard", () => {
 
     expect(screen.getByRole("navigation", { name: "관리자 메뉴" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Dashboard" })).toBeInTheDocument();
+    expect(screen.queryByText("Admin Management")).not.toBeInTheDocument();
     expect(screen.getByText("124,592")).toBeInTheDocument();
     expect(screen.getByText("45,210")).toBeInTheDocument();
     expect(screen.getByText("892,104")).toBeInTheDocument();

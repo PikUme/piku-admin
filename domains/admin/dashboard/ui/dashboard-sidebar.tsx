@@ -1,3 +1,5 @@
+"use client";
+
 import {
   ChartNoAxesCombined,
   History,
@@ -6,14 +8,28 @@ import {
   UsersRound,
 } from "lucide-react";
 
-const navItems = [
+import { ADMIN_ROLE } from "@/shared/api/admin-auth/contracts";
+import { useAuthenticatedAdmin } from "@/shared/api/admin-auth/use-authenticated-admin";
+
+const defaultNavItems = [
   { label: "Dashboard", icon: LayoutDashboard, active: true },
   { label: "Statistics", icon: ChartNoAxesCombined },
-  { label: "Admin Management", icon: UsersRound },
-  { label: "Audit Log", icon: History },
 ];
 
+const adminManagementItem = {
+  label: "Admin Management",
+  icon: UsersRound,
+};
+
+const trailingNavItems = [{ label: "Audit Log", icon: History }];
+
 export function DashboardSidebar() {
+  const admin = useAuthenticatedAdmin();
+  const navItems =
+    admin?.role === ADMIN_ROLE.SUPER_ADMIN
+      ? [...defaultNavItems, adminManagementItem, ...trailingNavItems]
+      : [...defaultNavItems, ...trailingNavItems];
+
   return (
     <aside className="hidden min-h-screen border-r border-slate-200 bg-slate-50 lg:flex lg:flex-col">
       <div className="px-7 py-8">

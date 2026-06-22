@@ -1,6 +1,23 @@
-import { dailySummaryRows } from "../model/dashboard-data";
+import type { DailySummaryPoint } from "../api/contracts";
 
-export function DataTable() {
+const getKstTodayDate = () => {
+  const now = new Date();
+  const formatter = new Intl.DateTimeFormat("ko-KR", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+  const parts = formatter.formatToParts(now);
+  const year = parts.find((p) => p.type === "year")?.value || "";
+  const month = parts.find((p) => p.type === "month")?.value || "";
+  const day = parts.find((p) => p.type === "day")?.value || "";
+  return `${year}-${month}-${day}`;
+};
+
+export function DataTable({ data = [] }: { data?: DailySummaryPoint[] }) {
+  const todayStr = getKstTodayDate();
+
   return (
     <div className="overflow-x-auto">
       <table className="w-full min-w-[820px] text-sm" aria-label="날짜별 데이터 요약">
@@ -15,26 +32,31 @@ export function DataTable() {
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-200">
-          {dailySummaryRows.map((row) => (
-            <tr className="text-slate-700 hover:bg-slate-50" key={row.date}>
-              <td className="px-5 py-4 font-medium">{row.date}</td>
-              <td className="px-5 py-4 text-right">{row.newUsers}</td>
-              <td className="px-5 py-4 text-right">{row.activeUsers}</td>
-              <td className="px-5 py-4 text-right">{row.diariesCreated}</td>
-              <td className="px-5 py-4 text-right">{row.aiRequests}</td>
-              <td className="px-5 py-4 text-center">
-                <span
-                  className={`rounded-full px-3 py-1 text-xs font-medium ${
-                    row.status === "Processing"
-                      ? "bg-emerald-100 text-emerald-700"
-                      : "bg-slate-200 text-slate-600"
-                  }`}
-                >
-                  {row.status}
-                </span>
-              </td>
-            </tr>
-          ))}
+          {data.map((row) => {
+            const isToday = row.date === todayStr;
+            const status = isToday ? "Processing" : "Closed";
+
+            return (
+              <tr className="text-slate-700 hover:bg-slate-50" key={row.date}>
+                <td className="px-5 py-4 font-medium">{row.date}</td>
+                <td className="px-5 py-4 text-right">{row.newMemberCount.toLocaleString()}</td>
+                <td className="px-5 py-4 text-right">{row.dau.toLocaleString()}</td>
+                <td className="px-5 py-4 text-right">{row.diaryCreationCount.toLocaleString()}</td>
+                <td className="px-5 py-4 text-right">{row.aiPhotoRequestCount.toLocaleString()}</td>
+                <td className="px-5 py-4 text-center">
+                  <span
+                    className={`rounded-full px-3 py-1 text-xs font-medium ${
+                      isToday
+                        ? "bg-emerald-100 text-emerald-700"
+                        : "bg-slate-200 text-slate-600"
+                    }`}
+                  >
+                    {status}
+                  </span>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

@@ -1,7 +1,8 @@
 import {
+  BookOpen,
   ChartColumnIncreasing,
   ImageIcon,
-  Server,
+  TrendingDown,
   TrendingUp,
   Users,
 } from "lucide-react";
@@ -14,12 +15,20 @@ const iconByKind: Record<MetricKind, typeof Users> = {
   members: Users,
   active: ChartColumnIncreasing,
   images: ImageIcon,
-  system: Server,
+  diaries: BookOpen,
 };
 
 export function MetricCard({ metric }: { metric: DashboardMetric }) {
   const Icon = iconByKind[metric.kind];
-  const isSystem = metric.kind === "system";
+  
+  const isNegative = metric.trend?.startsWith("-");
+  const isZero = metric.trend === "0%";
+  
+  const trendColor = isZero
+    ? "text-slate-500"
+    : isNegative
+      ? "text-rose-600"
+      : "text-emerald-600";
 
   return (
     <article className="dashboard-panel min-h-44 p-5">
@@ -27,13 +36,21 @@ export function MetricCard({ metric }: { metric: DashboardMetric }) {
         <p className="text-sm font-medium text-slate-600">{metric.label}</p>
         <IconTile
           icon={Icon}
-          tone={metric.kind === "images" ? "amber" : isSystem ? "slate" : "blue"}
+          tone={
+            metric.kind === "images"
+              ? "amber"
+              : metric.kind === "diaries"
+                ? "slate"
+                : "blue"
+          }
         />
       </div>
       <p className="mt-6 text-3xl font-bold tracking-tight text-slate-950">{metric.value}</p>
-      <div className={`mt-3 flex items-center gap-2 text-sm ${isSystem ? "text-slate-600" : "text-amber-700"}`}>
-        {isSystem ? (
-          <span className="size-2 rounded-full bg-emerald-500" />
+      <div className={`mt-3 flex items-center gap-2 text-sm ${trendColor}`}>
+        {isZero ? (
+          <span className="size-2 rounded-full bg-slate-400" />
+        ) : isNegative ? (
+          <TrendingDown aria-hidden="true" size={16} />
         ) : (
           <TrendingUp aria-hidden="true" size={16} />
         )}

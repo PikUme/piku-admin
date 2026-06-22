@@ -1,4 +1,4 @@
-export type MetricKind = "members" | "active" | "images" | "system";
+export type MetricKind = "members" | "active" | "images" | "diaries";
 
 export interface DashboardMetric {
   label: string;
@@ -31,10 +31,11 @@ export const dashboardMetrics: DashboardMetric[] = [
     kind: "images",
   },
   {
-    label: "시스템 상태",
-    value: "Stable",
-    detail: "API Latency: 42ms",
-    kind: "system",
+    label: "누적 일기 작성 수",
+    value: "542,109",
+    detail: "지난주 대비",
+    trend: "+12.5%",
+    kind: "diaries",
   },
 ];
 

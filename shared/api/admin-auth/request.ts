@@ -1,5 +1,6 @@
 import { AdminApiError, type AdminApiProblem } from "./contracts";
 import { readCookie } from "./cookies";
+import { baseUrl } from "./client";
 
 type AdminMethod = "GET" | "POST" | "PATCH" | "DELETE";
 
@@ -10,7 +11,6 @@ interface AdminRequestOptions {
 }
 
 interface CreateAdminAuthRequestOptions {
-  baseUrl: string;
   csrfCookieName: string;
   csrfHeaderName: string;
   cookieSource?: () => string;
@@ -47,7 +47,6 @@ async function readResponseBody(response: Response): Promise<unknown> {
 }
 
 export function createAdminAuthRequest({
-  baseUrl,
   csrfCookieName,
   csrfHeaderName,
   cookieSource = () => (typeof document === "undefined" ? "" : document.cookie),

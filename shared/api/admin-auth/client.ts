@@ -2,9 +2,10 @@ import { createAdminAuthRequest, type AdminAuthRequest } from "./request";
 
 export type AdminApiMode = "mock" | "remote";
 
+export const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL ?? "http://localhost:8080";
+
 export interface AdminAuthClientOptions {
   mode?: string;
-  baseUrl?: string;
   csrfCookieName?: string;
   csrfHeaderName?: string;
   cookieSource?: () => string;
@@ -20,15 +21,12 @@ export function resolveAdminApiMode(explicitMode?: string): AdminApiMode {
 export function createConfiguredAdminAuthRequest(
   options: AdminAuthClientOptions = {},
 ): AdminAuthRequest {
-  const baseUrl =
-    options.baseUrl ?? process.env.NEXT_PUBLIC_BACKEND_BASE_URL ?? "";
 
   if (!baseUrl) {
     throw new Error("NEXT_PUBLIC_BACKEND_BASE_URL 환경변수가 필요합니다.");
   }
 
   return createAdminAuthRequest({
-    baseUrl,
     csrfCookieName:
       options.csrfCookieName ??
       process.env.NEXT_PUBLIC_CSRF_COOKIE_NAME ??

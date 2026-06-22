@@ -8,7 +8,6 @@ describe("createAdminAuthRequest", () => {
       .fn<typeof fetch>()
       .mockResolvedValue(Response.json({ nextStep: "VERIFY_OTP" }));
     const request = createAdminAuthRequest({
-      baseUrl: "https://api.example.com/",
       csrfCookieName: "csrf_token",
       csrfHeaderName: "csrf_token",
       cookieSource: () => "csrf_token=abc%20123",
@@ -39,7 +38,6 @@ describe("createAdminAuthRequest", () => {
       .fn<typeof fetch>()
       .mockResolvedValue(new Response(null, { status: 204 }));
     const request = createAdminAuthRequest({
-      baseUrl: "https://api.example.com",
       csrfCookieName: "csrf_token",
       csrfHeaderName: "csrf_header",
       fetcher,
@@ -60,7 +58,6 @@ describe("createAdminAuthRequest", () => {
   it("rejects unsafe requests before fetch when the CSRF cookie is missing", async () => {
     const fetcher = vi.fn<typeof fetch>();
     const request = createAdminAuthRequest({
-      baseUrl: "https://api.example.com",
       csrfCookieName: "csrf_token",
       csrfHeaderName: "csrf_header",
       cookieSource: () => "",
@@ -88,7 +85,6 @@ describe("createAdminAuthRequest", () => {
       ),
     );
     const request = createAdminAuthRequest({
-      baseUrl: "https://api.example.com",
       csrfCookieName: "csrf_token",
       csrfHeaderName: "csrf_header",
       cookieSource: () => "csrf_token=token",

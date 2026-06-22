@@ -8,7 +8,6 @@ describe("createLoginApi", () => {
       .fn<typeof fetch>()
       .mockResolvedValue(new Response(null, { status: 204 }));
     const api = createLoginApi({
-      baseUrl: "https://api.example.com",
       fetcher,
     });
 
@@ -31,7 +30,7 @@ describe("createLoginApi", () => {
   });
 
   it("requires a backend URL in remote mode", () => {
-    expect(() => createLoginApi({ mode: "remote", baseUrl: "" })).toThrow(
+    expect(() => createLoginApi({ mode: "remote" })).toThrow(
       "NEXT_PUBLIC_BACKEND_BASE_URL 환경변수가 필요합니다.",
     );
   });
@@ -42,7 +41,6 @@ describe("createLoginApi", () => {
       .mockResolvedValue(new Response(null, { status: 204 }));
     const api = createLoginApi({
       mode: "remote",
-      baseUrl: "https://api.example.com",
       csrfCookieName: "custom_cookie",
       csrfHeaderName: "X-CUSTOM-CSRF",
       cookieSource: () => "custom_cookie=token",

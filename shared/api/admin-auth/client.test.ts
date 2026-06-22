@@ -16,7 +16,6 @@ describe("admin auth client configuration", () => {
       .fn<typeof fetch>()
       .mockResolvedValue(Response.json({ nextStep: "VERIFY_OTP" }));
     const request = createConfiguredAdminAuthRequest({
-      baseUrl: "https://example.com/",
       cookieSource: () => "csrf_token=token",
       fetcher,
     });

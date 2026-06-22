@@ -8,7 +8,6 @@ describe("createOnboardingApi", () => {
       .fn<typeof fetch>()
       .mockResolvedValue(new Response(null, { status: 204 }));
     const api = createOnboardingApi({
-      baseUrl: "https://api.example.com",
       fetcher,
     });
 
@@ -29,7 +28,7 @@ describe("createOnboardingApi", () => {
   });
 
   it("requires a base URL in remote mode", () => {
-    expect(() => createOnboardingApi({ mode: "remote", baseUrl: "" })).toThrow(
+    expect(() => createOnboardingApi({ mode: "remote" })).toThrow(
       "NEXT_PUBLIC_BACKEND_BASE_URL 환경변수가 필요합니다.",
     );
   });
@@ -40,7 +39,6 @@ describe("createOnboardingApi", () => {
       .mockResolvedValue(new Response(null, { status: 204 }));
     const api = createOnboardingApi({
       mode: "remote",
-      baseUrl: "https://api.example.com",
       fetcher,
     });
 

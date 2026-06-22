@@ -20,7 +20,7 @@ describe("createAdminAuthRequest", () => {
     });
 
     expect(fetcher).toHaveBeenCalledWith(
-      "https://api.example.com/api/admin/auth/login",
+      "http://localhost:8080/api/admin/auth/login",
       {
         method: "POST",
         credentials: "include",
@@ -47,7 +47,7 @@ describe("createAdminAuthRequest", () => {
     await request("/api/admin/auth/csrf", { method: "POST", csrf: false });
 
     expect(fetcher).toHaveBeenCalledWith(
-      "https://api.example.com/api/admin/auth/csrf",
+      "http://localhost:8080/api/admin/auth/csrf",
       expect.objectContaining({
         credentials: "include",
         headers: { "Content-Type": "application/json" },

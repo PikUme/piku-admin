@@ -1,6 +1,6 @@
 import { AdminApiError, type AdminApiProblem } from "./contracts";
+import { getAdminAuthBaseUrl } from "./config";
 import { readCookie } from "./cookies";
-import { baseUrl } from "./client";
 
 type AdminMethod = "GET" | "POST" | "PATCH" | "DELETE";
 
@@ -52,7 +52,7 @@ export function createAdminAuthRequest({
   cookieSource = () => (typeof document === "undefined" ? "" : document.cookie),
   fetcher = fetch,
 }: CreateAdminAuthRequestOptions): AdminAuthRequest {
-  const normalizedBaseUrl = baseUrl.replace(/\/$/, "");
+  const normalizedBaseUrl = getAdminAuthBaseUrl().replace(/\/$/, "");
 
   return async function request<T = unknown>(
     path: string,

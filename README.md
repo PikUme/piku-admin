@@ -16,13 +16,14 @@ pnpm dev
 `.env.sample`을 `.env.local`로 복사해 사용합니다.
 
 ```dotenv
-NEXT_PUBLIC_API_MODE=remote
 NEXT_PUBLIC_BACKEND_BASE_URL=http://localhost:8080
 NEXT_PUBLIC_CSRF_COOKIE_NAME=csrf_token
 NEXT_PUBLIC_CSRF_HEADER_NAME=csrf_header
 ```
 
-기본 모드는 `remote`이며 `NEXT_PUBLIC_BACKEND_BASE_URL`의 백엔드 API를 호출합니다. UI만 독립 개발할 때는 `NEXT_PUBLIC_API_MODE=mock`을 명시합니다. 백엔드 기본 CSRF 쿠키명은 `csrf_token`, 헤더명은 `csrf_header`이며 각각 환경변수로 덮어쓸 수 있습니다.
+개발 및 운영 환경에서는 `NEXT_PUBLIC_BACKEND_BASE_URL`의 백엔드 API를 호출합니다. 백엔드 기본 CSRF 쿠키명은 `csrf_token`, 헤더명은 `csrf_header`이며 각각 환경변수로 덮어쓸 수 있습니다.
+
+`pnpm test` 실행 시에만 MSW가 백엔드 요청을 가로채 테스트 응답을 반환합니다. 등록되지 않은 요청은 실제 네트워크로 전달되지 않고 테스트를 실패시킵니다.
 
 ## Verification
 

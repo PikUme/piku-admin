@@ -1,14 +1,18 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
-import {
-  createConfiguredAdminAuthRequest,
-  resolveAdminApiMode,
-} from "./client";
+import { createConfiguredAdminAuthRequest } from "./client";
 
 describe("admin auth client configuration", () => {
-  it("uses remote mode by default and allows explicit mock mode", () => {
-    expect(resolveAdminApiMode()).toBe("remote");
-    expect(resolveAdminApiMode("mock")).toBe("mock");
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("requires a backend URL", () => {
+    vi.stubEnv("NEXT_PUBLIC_BACKEND_BASE_URL", "");
+
+    expect(() => createConfiguredAdminAuthRequest()).toThrow(
+      "NEXT_PUBLIC_BACKEND_BASE_URL 환경변수가 필요합니다.",
+    );
   });
 
   it("centralizes the backend URL and default CSRF names", async () => {
@@ -23,7 +27,7 @@ describe("admin auth client configuration", () => {
     await request("/api/admin/auth/login", { method: "POST", body: {} });
 
     expect(fetcher).toHaveBeenCalledWith(
-      "https://example.com/api/admin/auth/login",
+      "http://localhost:8080/api/admin/auth/login",
       expect.objectContaining({
         headers: expect.objectContaining({ csrf_header: "token" }),
       }),

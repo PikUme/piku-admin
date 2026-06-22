@@ -1,6 +1,8 @@
 import path from "node:path";
 import { defineConfig } from "vitest/config";
 
+import { testAdminAuthEnv } from "./test/msw/config";
+
 export default defineConfig({
   resolve: {
     alias: {
@@ -8,6 +10,7 @@ export default defineConfig({
     },
   },
   test: {
+    env: testAdminAuthEnv,
     environment: "jsdom",
     globals: true,
     setupFiles: ["./vitest.setup.ts"],

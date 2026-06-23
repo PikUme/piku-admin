@@ -8,7 +8,7 @@ interface TabItem {
 }
 
 const TABS: TabItem[] = [
-  { id: "visitor", label: "방문/DAU" },
+  { id: "active", label: "활성 사용자/DAU" },
   { id: "member", label: "회원/가입" },
   { id: "diary", label: "일기 생성" },
   { id: "photo", label: "AI 사진" },

@@ -1,11 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { type ChartDataPoint, type TabKind } from "../model/statistics-data";
+import {
+  type ChartDataPoint,
+  type LegacyTabKind,
+} from "../model/statistics-data";
 
 interface VisitorChartProps {
   chartData: ChartDataPoint[];
-  tabKind: TabKind;
+  tabKind: LegacyTabKind;
 }
 
 export function VisitorChart({ chartData, tabKind }: VisitorChartProps) {
@@ -50,8 +53,6 @@ export function VisitorChart({ chartData, tabKind }: VisitorChartProps) {
   // Colors based on TabKind
   const getLegendLabels = (): [string, string] => {
     switch (tabKind) {
-      case "visitor":
-        return ["신규 방문", "재방문"];
       case "member":
         return ["이메일 가입", "소셜 가입"];
       case "diary":
@@ -63,8 +64,6 @@ export function VisitorChart({ chartData, tabKind }: VisitorChartProps) {
 
   const getColors = (): [string, string] => {
     switch (tabKind) {
-      case "visitor":
-        return ["#0864d9", "#b4c9e4"]; // Dark Blue, Light Blue/Gray
       case "member":
         return ["#2563eb", "#93c5fd"]; // Blue, Sky Blue
       case "diary":

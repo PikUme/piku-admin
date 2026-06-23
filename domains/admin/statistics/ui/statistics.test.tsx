@@ -10,36 +10,48 @@ window.URL.createObjectURL = mockCreateObjectURL;
 window.URL.revokeObjectURL = mockRevokeObjectURL;
 
 describe("StatisticsPage", () => {
-  it("renders the statistics console overview with layout components", () => {
+  it("renders measurable active-user and DAU statistics by default", () => {
     render(<StatisticsPage />);
 
     expect(screen.getByRole("navigation", { name: "관리자 메뉴" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Statistics" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "통계 상세" })).toBeInTheDocument();
-    
-    // KPI Cards check
-    expect(screen.getByText("총 방문자 (7일)")).toBeInTheDocument();
-    expect(screen.getByText("14,208")).toBeInTheDocument();
+
+    expect(
+      screen.getByRole("button", { name: "활성 사용자/DAU" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("7일 활성 회원 수")).toBeInTheDocument();
+    expect(screen.getByText("32,940")).toBeInTheDocument();
     expect(screen.getByText("평균 DAU")).toBeInTheDocument();
-    expect(screen.getByText("2,029")).toBeInTheDocument();
-    expect(screen.getByText("최대 피크 일자")).toBeInTheDocument();
-    expect(screen.getByText("10월 5일 (목)")).toBeInTheDocument();
-    expect(screen.getByText("평균 체류 시간")).toBeInTheDocument();
-    expect(screen.getByText("04:12")).toBeInTheDocument();
+    expect(screen.getByText("8,229")).toBeInTheDocument();
+    expect(screen.getByText("최대 DAU")).toBeInTheDocument();
+    expect(screen.getByText("12,100명 · 2026.06.22")).toBeInTheDocument();
+    expect(screen.getByText("누적 활성 회원·일")).toBeInTheDocument();
+    expect(screen.getByText("57,600")).toBeInTheDocument();
+
+    expect(screen.getByRole("heading", { name: "DAU 추이" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "날짜별 DAU 상세" }),
+    ).toBeInTheDocument();
+
+    expect(screen.queryByText("평균 체류 시간")).not.toBeInTheDocument();
+    expect(screen.queryByText("신규 방문")).not.toBeInTheDocument();
+    expect(screen.queryByText("재방문")).not.toBeInTheDocument();
+    expect(screen.queryByText("재방문율")).not.toBeInTheDocument();
+    expect(screen.queryByText("가입 전환")).not.toBeInTheDocument();
   });
 
   it("filters table data based on search queries", () => {
     render(<StatisticsPage />);
 
     const searchInput = screen.getByPlaceholderText("데이터 검색...");
-    expect(screen.getByText("2023.10.07")).toBeInTheDocument();
-    expect(screen.getByText("2023.10.06")).toBeInTheDocument();
+    expect(screen.getByText("2026.06.22")).toBeInTheDocument();
+    expect(screen.getByText("2026.06.21")).toBeInTheDocument();
 
-    // Type query to filter only October 7th
-    fireEvent.change(searchInput, { target: { value: "10.07" } });
+    fireEvent.change(searchInput, { target: { value: "06.22" } });
     
-    expect(screen.getByText("2023.10.07")).toBeInTheDocument();
-    expect(screen.queryByText("2023.10.06")).not.toBeInTheDocument();
+    expect(screen.getByText("2026.06.22")).toBeInTheDocument();
+    expect(screen.queryByText("2026.06.21")).not.toBeInTheDocument();
 
     // Type a query that yields no results
     fireEvent.change(searchInput, { target: { value: "invalid-query" } });
@@ -67,15 +79,15 @@ describe("StatisticsPage", () => {
     const range30dButton = screen.getByRole("button", { name: "30일" });
     fireEvent.click(range30dButton);
 
-    expect(screen.getByText("2023.09.08 - 2023.10.07")).toBeInTheDocument();
-    expect(screen.getByText("총 방문자 (30일)")).toBeInTheDocument();
+    expect(screen.getByText("2026.05.24 - 2026.06.22")).toBeInTheDocument();
+    expect(screen.getByText("30일 활성 회원 수")).toBeInTheDocument();
 
     // Toggle to 3 months
     const range3mButton = screen.getByRole("button", { name: "3개월" });
     fireEvent.click(range3mButton);
 
-    expect(screen.getByText("2023.07.08 - 2023.10.07")).toBeInTheDocument();
-    expect(screen.getByText("총 방문자 (3개월)")).toBeInTheDocument();
+    expect(screen.getByText("2026.03.25 - 2026.06.22")).toBeInTheDocument();
+    expect(screen.getByText("3개월 활성 회원 수")).toBeInTheDocument();
   });
 
   it("triggers CSV download when clicking CSV 다운로드 button", () => {

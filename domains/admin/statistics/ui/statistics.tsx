@@ -16,6 +16,7 @@ import {
 
 import { KPICards } from "./kpi-cards";
 import { DauLineChart } from "./dau-line-chart";
+import { DauTable } from "./dau-table";
 import { StatsTable } from "./stats-table";
 import { StatisticsTabs } from "./tabs";
 import { VisitorChart } from "./visitor-chart";
@@ -101,16 +102,6 @@ export function StatisticsPage() {
       iconKind: "clock",
     },
   ];
-
-  const activeRows = activeUserData.daily
-    .filter((point) => {
-      const query = searchQuery.trim().replaceAll("-", ".").toLowerCase();
-      return (
-        query.length === 0 ||
-        point.date.replaceAll("-", ".").toLowerCase().includes(query)
-      );
-    })
-    .toReversed();
 
   // CSV download function with BOM for Excel Korean support
   const handleCSVDownload = () => {
@@ -277,68 +268,12 @@ export function StatisticsPage() {
           {/* Detailed Searchable Table Section */}
           <section aria-label="상세 일자별 데이터">
             {activeTab === "active" ? (
-              <div className="dashboard-panel overflow-hidden">
-                <div className="flex flex-col gap-4 border-b border-slate-100 p-5 sm:flex-row sm:items-center sm:justify-between">
-                  <h2 className="text-sm font-bold text-slate-700">
-                    날짜별 DAU 상세
-                  </h2>
-                  <input
-                    type="text"
-                    placeholder="데이터 검색..."
-                    value={searchQuery}
-                    onChange={(event) => setSearchQuery(event.target.value)}
-                    className="h-10 w-full max-w-xs rounded-lg border border-slate-300 px-3 text-sm"
-                    aria-label="데이터 검색"
-                  />
-                </div>
-                <div className="overflow-x-auto">
-                  <table
-                    className="w-full min-w-[680px] text-sm"
-                    aria-label="날짜별 DAU 상세 데이터"
-                  >
-                    <thead>
-                      <tr className="border-b border-slate-200 bg-slate-50 text-slate-600">
-                        <th className="px-6 py-3.5 text-left">날짜</th>
-                        <th className="px-6 py-3.5 text-right">DAU</th>
-                        <th className="px-6 py-3.5 text-right">전일 대비</th>
-                        <th className="px-6 py-3.5 text-right">전일 대비율</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200">
-                      {activeRows.length === 0 ? (
-                        <tr>
-                          <td
-                            colSpan={4}
-                            className="px-6 py-10 text-center text-slate-400"
-                          >
-                            검색 결과가 없습니다.
-                          </td>
-                        </tr>
-                      ) : (
-                        activeRows.map((point) => (
-                          <tr key={point.date}>
-                            <td className="px-6 py-4">
-                              {formatDate(point.date)}
-                            </td>
-                            <td className="px-6 py-4 text-right">
-                              {point.dau.toLocaleString()}
-                            </td>
-                            <td className="px-6 py-4 text-right">
-                              {point.changeCount > 0 ? "+" : ""}
-                              {point.changeCount.toLocaleString()}명
-                            </td>
-                            <td className="px-6 py-4 text-right">
-                              {point.changeRate === null
-                                ? "신규"
-                                : `${point.changeRate > 0 ? "+" : ""}${point.changeRate.toFixed(1)}%`}
-                            </td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+              <DauTable
+                points={activeUserData.daily}
+                peakDate={activeUserData.summary.peakDate}
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+              />
             ) : (
               <StatsTable
                 columns={legacyData!.columns}

@@ -4,7 +4,10 @@ import { describe, expect, it, vi } from "vitest";
 import { StatisticsPage } from "./statistics";
 
 // Mock window.URL.createObjectURL and HTMLAnchorElement click
-const mockCreateObjectURL = vi.fn(() => "blob:url");
+const mockCreateObjectURL = vi.fn((object: Blob | MediaSource) => {
+  void object;
+  return "blob:url";
+});
 const mockRevokeObjectURL = vi.fn();
 window.URL.createObjectURL = mockCreateObjectURL;
 window.URL.revokeObjectURL = mockRevokeObjectURL;

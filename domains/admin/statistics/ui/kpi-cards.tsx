@@ -3,6 +3,7 @@
 import {
   CalendarDays,
   Clock,
+  Info,
   TrendingDown,
   TrendingUp,
   UsersRound,
@@ -27,7 +28,19 @@ export function KPICards({ items }: KPICardsProps) {
             className="flex flex-col justify-between p-6 rounded-xl border border-slate-200 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)] hover:shadow-md transition-shadow duration-200"
           >
             <div className="flex items-start justify-between">
-              <span className="text-sm font-semibold text-slate-500">{item.label}</span>
+              <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500">
+                {item.label}
+                {item.description && (
+                  <button
+                    type="button"
+                    aria-label={`${item.label} 집계 기준`}
+                    title={item.description}
+                    className="rounded-full text-slate-400 transition hover:text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                  >
+                    <Info size={14} aria-hidden="true" />
+                  </button>
+                )}
+              </span>
               <div className={`p-2 rounded-lg ${iconBgColor} ${iconColor}`}>
                 <Icon size={20} aria-hidden="true" />
               </div>

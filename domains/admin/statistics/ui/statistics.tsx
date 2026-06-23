@@ -15,6 +15,7 @@ import {
 } from "../model/statistics-data";
 
 import { KPICards } from "./kpi-cards";
+import { DauLineChart } from "./dau-line-chart";
 import { StatsTable } from "./stats-table";
 import { StatisticsTabs } from "./tabs";
 import { VisitorChart } from "./visitor-chart";
@@ -264,13 +265,10 @@ export function StatisticsPage() {
               {activeTab === "active" ? "DAU 추이" : legacyData!.chartTitle}
             </h2>
             {activeTab === "active" ? (
-              <div
-                className="flex h-[300px] items-center justify-center text-sm font-medium text-slate-500"
-                role="img"
-                aria-label="일별 DAU 선 차트"
-              >
-                일별 DAU 데이터 {activeUserData.daily.length}건
-              </div>
+              <DauLineChart
+                points={activeUserData.daily}
+                peakDate={activeUserData.summary.peakDate}
+              />
             ) : (
               <VisitorChart chartData={legacyData!.chartData} tabKind={activeTab} />
             )}

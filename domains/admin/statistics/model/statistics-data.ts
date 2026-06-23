@@ -1,6 +1,7 @@
 export interface KPICardData {
   label: string;
   value: string;
+  description?: string;
   trend?: {
     value: string;
     isPositive: boolean;
@@ -34,108 +35,13 @@ export interface TabData {
 }
 
 export type TimeRange = "7d" | "30d" | "3m";
-export type TabKind = "visitor" | "member" | "diary" | "photo";
+export type TabKind = "active" | "member" | "diary" | "photo";
+export type LegacyTabKind = Exclude<TabKind, "active">;
 
-export const STATISTICS_DATA: Record<TabKind, Record<TimeRange, TabData>> = {
-  visitor: {
-    "7d": {
-      chartTitle: "방문자 추이",
-      tableTitle: "날짜별 상세 데이터",
-      columns: ["날짜", "총 방문 (DAU)", "신규 방문", "재방문", "재방문율", "가입 전환"],
-      kpis: [
-        { label: "총 방문자 (7일)", value: "14,208", trend: { value: "12.5%", isPositive: true }, iconKind: "users" },
-        { label: "평균 DAU", value: "2,029", trend: { value: "4.2%", isPositive: true }, iconKind: "chart" },
-        { label: "최대 피크 일자", value: "10월 5일 (목)", iconKind: "calendar" },
-        { label: "평균 체류 시간", value: "04:12", trend: { value: "1.1%", isPositive: false }, iconKind: "clock" },
-      ],
-      chartData: [
-        { label: "10.01", primary: 700, secondary: 260 },
-        { label: "10.02", primary: 900, secondary: 400 },
-        { label: "10.03", primary: 1800, secondary: 600 },
-        { label: "10.04", primary: 1072, secondary: 578 },
-        { label: "10.05", primary: 2484, secondary: 621 },
-        { label: "10.06", primary: 1995, secondary: 856 },
-        { label: "10.07", primary: 1068, secondary: 874 },
-      ],
-      tableData: [
-        { date: "2023.10.07", col1: "1,942", col2: "1,068", col3: "874", col4: "45.0%", col5: "142" },
-        { date: "2023.10.06", col1: "2,851", col2: "1,995", col3: "856", col4: "30.0%", col5: "215" },
-        { date: "2023.10.05", col1: "3,105", col2: "2,484", col3: "621", col4: "20.0%", col5: "301", isPeak: true },
-        { date: "2023.10.04", col1: "1,650", col2: "1,072", col3: "578", col4: "35.0%", col5: "98" },
-        { date: "2023.10.03", col1: "2,400", col2: "1,800", col3: "600", col4: "25.0%", col5: "180" },
-        { date: "2023.10.02", col1: "1,300", col2: "900", col3: "400", col4: "30.8%", col5: "110" },
-        { date: "2023.10.01", col1: "960", col2: "700", col3: "260", col4: "27.1%", col5: "60" },
-      ],
-    },
-    "30d": {
-      chartTitle: "방문자 추이 (최근 30일)",
-      tableTitle: "날짜별 상세 데이터 (30일)",
-      columns: ["날짜", "총 방문 (DAU)", "신규 방문", "재방문", "재방문율", "가입 전환"],
-      kpis: [
-        { label: "총 방문자 (30일)", value: "62,450", trend: { value: "8.4%", isPositive: true }, iconKind: "users" },
-        { label: "평균 DAU", value: "2,081", trend: { value: "2.1%", isPositive: true }, iconKind: "chart" },
-        { label: "최대 피크 일자", value: "9월 28일 (금)", iconKind: "calendar" },
-        { label: "평균 체류 시간", value: "03:58", trend: { value: "0.5%", isPositive: true }, iconKind: "clock" },
-      ],
-      chartData: Array.from({ length: 15 }).map((_, i) => ({
-        label: `09.${16 + i}`,
-        primary: Math.floor(1000 + Math.random() * 1500),
-        secondary: Math.floor(300 + Math.random() * 500),
-      })),
-      tableData: Array.from({ length: 30 }).map((_, i) => {
-        const primary = Math.floor(1000 + Math.random() * 1500);
-        const secondary = Math.floor(300 + Math.random() * 500);
-        const total = primary + secondary;
-        const rate = ((secondary / total) * 100).toFixed(1) + "%";
-        const conv = Math.floor(total * 0.08);
-        const date = `2023.09.${(30 - i).toString().padStart(2, "0")}`;
-        return {
-          date,
-          col1: total.toLocaleString(),
-          col2: primary.toLocaleString(),
-          col3: secondary.toLocaleString(),
-          col4: rate,
-          col5: conv.toLocaleString(),
-          isPeak: i === 12,
-        };
-      }),
-    },
-    "3m": {
-      chartTitle: "방문자 추이 (최근 3개월)",
-      tableTitle: "날짜별 상세 데이터 (3개월)",
-      columns: ["날짜", "총 방문 (DAU)", "신규 방문", "재방문", "재방문율", "가입 전환"],
-      kpis: [
-        { label: "총 방문자 (3개월)", value: "186,920", trend: { value: "15.3%", isPositive: true }, iconKind: "users" },
-        { label: "평균 DAU", value: "2,054", trend: { value: "1.8%", isPositive: false }, iconKind: "chart" },
-        { label: "최대 피크 일자", value: "8월 14일 (월)", iconKind: "calendar" },
-        { label: "평균 체류 시간", value: "04:02", trend: { value: "2.3%", isPositive: true }, iconKind: "clock" },
-      ],
-      chartData: Array.from({ length: 12 }).map((_, i) => ({
-        label: `W${i + 1}`,
-        primary: Math.floor(8000 + Math.random() * 6000),
-        secondary: Math.floor(3000 + Math.random() * 2000),
-      })),
-      tableData: Array.from({ length: 90 }).map((_, i) => {
-        const primary = Math.floor(1000 + Math.random() * 1500);
-        const secondary = Math.floor(300 + Math.random() * 500);
-        const total = primary + secondary;
-        const rate = ((secondary / total) * 100).toFixed(1) + "%";
-        const conv = Math.floor(total * 0.08);
-        const day = (i % 28) + 1;
-        const month = 10 - Math.floor(i / 28);
-        const date = `2023.${month.toString().padStart(2, "0")}.${day.toString().padStart(2, "0")}`;
-        return {
-          date,
-          col1: total.toLocaleString(),
-          col2: primary.toLocaleString(),
-          col3: secondary.toLocaleString(),
-          col4: rate,
-          col5: conv.toLocaleString(),
-          isPeak: i === 45,
-        };
-      }),
-    },
-  },
+export const STATISTICS_DATA: Record<
+  LegacyTabKind,
+  Record<TimeRange, TabData>
+> = {
   member: {
     "7d": {
       chartTitle: "신규 가입 추이",

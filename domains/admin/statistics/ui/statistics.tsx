@@ -121,7 +121,7 @@ export function StatisticsPage() {
       activeUserData.daily.toReversed().forEach((point) => {
         csvRows.push(
           [
-            point.date,
+            formatDate(point.date),
             point.dau.toLocaleString(),
             `${point.changeCount > 0 ? "+" : ""}${point.changeCount.toLocaleString()}명`,
             point.changeRate === null

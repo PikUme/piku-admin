@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { StatisticsPage } from "./statistics";
@@ -90,16 +90,43 @@ describe("StatisticsPage", () => {
     expect(screen.getByText("3개월 활성 회원 수")).toBeInTheDocument();
   });
 
-  it("triggers CSV download when clicking CSV 다운로드 button", () => {
-    const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
+  it("downloads the full active-user range as a dated CSV", async () => {
+    let downloadName = "";
+    const clickSpy = vi
+      .spyOn(HTMLAnchorElement.prototype, "click")
+      .mockImplementation(function (this: HTMLAnchorElement) {
+        downloadName = this.download;
+      });
+    mockCreateObjectURL.mockClear();
     
     render(<StatisticsPage />);
 
+    fireEvent.change(screen.getByPlaceholderText("데이터 검색..."), {
+      target: { value: "06.22" },
+    });
     const downloadButton = screen.getByRole("button", { name: "CSV 파일 다운로드" });
     fireEvent.click(downloadButton);
 
     expect(mockCreateObjectURL).toHaveBeenCalled();
     expect(clickSpy).toHaveBeenCalled();
+    expect(downloadName).toBe(
+      "piku_active_users_dau_7d_2026-06-16_2026-06-22.csv",
+    );
+
+    const blob = mockCreateObjectURL.mock.calls.at(-1)?.[0] as Blob;
+    let content = "";
+    await act(async () => {
+      content = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result));
+        reader.onerror = () => reject(reader.error);
+        reader.readAsText(blob);
+      });
+    });
+
+    expect(content).toContain('"날짜","DAU","전일 대비","전일 대비율"');
+    expect(content).toContain('"2026.06.22"');
+    expect(content).toContain('"2026.06.16"');
 
     clickSpy.mockRestore();
   });

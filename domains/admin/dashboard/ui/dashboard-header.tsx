@@ -9,14 +9,20 @@ import {
   RefreshCw,
 } from "lucide-react";
 
-export function DashboardHeader({ title = "Dashboard" }: { title?: string }) {
+export function DashboardHeader({
+  title = "Dashboard",
+  category = "Pikume",
+}: {
+  title?: string;
+  category?: string;
+}) {
   return (
     <header className="flex min-h-18 items-center justify-between gap-4 border-b border-slate-200 bg-white px-4 py-3 sm:px-6">
       <div className="flex min-w-0 items-center gap-3">
         <button className="icon-button lg:hidden" type="button" aria-label="메뉴 열기">
           <Menu aria-hidden="true" size={21} />
         </button>
-        <span className="hidden text-sm font-semibold text-slate-700 sm:inline">Pikume</span>
+        <span className="hidden text-sm font-semibold text-slate-700 sm:inline">{category}</span>
         <ChevronRight className="hidden text-slate-400 sm:block" aria-hidden="true" size={16} />
         <h1 className="truncate text-base font-bold text-blue-700">{title}</h1>
       </div>

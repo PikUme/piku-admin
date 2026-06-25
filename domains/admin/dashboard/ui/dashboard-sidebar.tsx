@@ -27,7 +27,7 @@ const defaultNavItems: DashboardNavItem[] = [
 const adminManagementItem: DashboardNavItem = {
   label: "Admin Management",
   icon: UsersRound,
-  href: "#",
+  href: "/admin/management",
 };
 
 const trailingNavItems: DashboardNavItem[] = [

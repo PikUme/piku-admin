@@ -21,7 +21,7 @@ NEXT_PUBLIC_CSRF_COOKIE_NAME=csrf_token
 NEXT_PUBLIC_CSRF_HEADER_NAME=csrf_header
 ```
 
-개발 및 운영 환경에서는 `NEXT_PUBLIC_BACKEND_BASE_URL`의 백엔드 API를 호출합니다. 백엔드 기본 CSRF 쿠키명은 `csrf_token`, 헤더명은 `csrf_header`이며 각각 환경변수로 덮어쓸 수 있습니다.
+개발 및 운영 환경에서는 `NEXT_PUBLIC_BACKEND_BASE_URL`의 백엔드 API를 호출합니다. `NEXT_PUBLIC_CSRF_COOKIE_NAME`과 `NEXT_PUBLIC_CSRF_HEADER_NAME`도 필수이며, 관리자 API 요청 생성 시 한곳에서 읽어 CSRF 쿠키 조회와 헤더 주입에 사용합니다.
 
 `pnpm test` 실행 시에만 MSW가 백엔드 요청을 가로채 테스트 응답을 반환합니다. 등록되지 않은 요청은 실제 네트워크로 전달되지 않고 테스트를 실패시킵니다.
 

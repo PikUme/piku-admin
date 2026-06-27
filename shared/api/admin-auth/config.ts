@@ -8,14 +8,19 @@ export interface AdminAuthConfig {
   csrfHeaderName: string;
 }
 
-export function getAdminAuthBaseUrl(): string {
-  const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL ?? "";
-
-  if (!baseUrl) {
-    throw new Error("NEXT_PUBLIC_BACKEND_BASE_URL 환경변수가 필요합니다.");
+function requireEnv(name: string, value: string | undefined): string {
+  if (!value) {
+    throw new Error(`${name} 환경변수가 필요합니다.`);
   }
 
-  return baseUrl;
+  return value;
+}
+
+export function getAdminAuthBaseUrl(): string {
+  return requireEnv(
+    "NEXT_PUBLIC_BACKEND_BASE_URL",
+    process.env.NEXT_PUBLIC_BACKEND_BASE_URL,
+  );
 }
 
 export function resolveAdminAuthConfig(
@@ -24,11 +29,15 @@ export function resolveAdminAuthConfig(
   return {
     csrfCookieName:
       options.csrfCookieName ??
-      process.env.NEXT_PUBLIC_CSRF_COOKIE_NAME ??
-      "csrf_token",
+      requireEnv(
+        "NEXT_PUBLIC_CSRF_COOKIE_NAME",
+        process.env.NEXT_PUBLIC_CSRF_COOKIE_NAME,
+      ),
     csrfHeaderName:
       options.csrfHeaderName ??
-      process.env.NEXT_PUBLIC_CSRF_HEADER_NAME ??
-      "csrf_header",
+      requireEnv(
+        "NEXT_PUBLIC_CSRF_HEADER_NAME",
+        process.env.NEXT_PUBLIC_CSRF_HEADER_NAME,
+      ),
   };
 }

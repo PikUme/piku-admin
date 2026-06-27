@@ -15,12 +15,23 @@ describe("admin auth client configuration", () => {
     );
   });
 
-  it("centralizes the backend URL and default CSRF names", async () => {
+  it("requires CSRF environment names", () => {
+    vi.stubEnv("NEXT_PUBLIC_CSRF_COOKIE_NAME", "");
+    vi.stubEnv("NEXT_PUBLIC_CSRF_HEADER_NAME", "");
+
+    expect(() => createConfiguredAdminAuthRequest()).toThrow(
+      "NEXT_PUBLIC_CSRF_COOKIE_NAME 환경변수가 필요합니다.",
+    );
+  });
+
+  it("centralizes the backend URL and CSRF names from env", async () => {
+    vi.stubEnv("NEXT_PUBLIC_CSRF_COOKIE_NAME", "custom_csrf_cookie");
+    vi.stubEnv("NEXT_PUBLIC_CSRF_HEADER_NAME", "x-custom-csrf");
     const fetcher = vi
       .fn<typeof fetch>()
       .mockResolvedValue(Response.json({ nextStep: "VERIFY_OTP" }));
     const request = createConfiguredAdminAuthRequest({
-      cookieSource: () => "csrf_token=token",
+      cookieSource: () => "custom_csrf_cookie=token",
       fetcher,
     });
 
@@ -29,7 +40,7 @@ describe("admin auth client configuration", () => {
     expect(fetcher).toHaveBeenCalledWith(
       "http://localhost:8080/api/admin/auth/login",
       expect.objectContaining({
-        headers: expect.objectContaining({ csrf_header: "token" }),
+        headers: expect.objectContaining({ "x-custom-csrf": "token" }),
       }),
     );
   });
